@@ -7,9 +7,9 @@
     @method('PUT')
     <div class="row">
 
-        <x-adminlte-input name="name" label="Nome" placeholder="Nome do produto" fgroup-class="col-md-6"
+        <x-adminlte-input value="{{ $product->name }}" name="name" label="Nome" placeholder="Nome do produto" fgroup-class="col-md-6"
             disable-feedback />
-        <x-adminlte-input name="price" label="Valor" type="number" placeholder="0,00" fgroup-class="col-md-2"
+        <x-adminlte-input value="{{ $product->price }}" name="price" label="Valor" type="number" placeholder="0,00" fgroup-class="col-md-2"
             disable-feedback />
 
         <div class="col-12 mt-3">

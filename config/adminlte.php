@@ -315,11 +315,6 @@ return [
             'type' => 'sidebar-menu-search',
             'text' => 'search',
         ],
-        [
-            'text' => 'blog',
-            'url' => 'admin/blog',
-            'can' => 'manage-blog',
-        ],
         ['header' => 'account_settings'],
         [
             'text' => 'profile',
@@ -327,27 +322,9 @@ return [
             'icon' => 'fas fa-fw fa-user',
         ],
         [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
+            'text' => 'Produtos',
+            'route' => 'products.index',
             'icon' => 'fas fa-fw fa-lock',
-        ],
-        [
-            'text' => 'Podutos',
-            'icon' => 'fas fa-fw fa-share',
-            'submenu' => [
-                [
-                    'text' => 'Visualizar produtos',
-                    'route' => 'products.index',
-                    'icon' => 'far fa-fw fa-file',
-                    'label' => 4,
-                    'label_color' => 'success',
-                ],
-                [
-                    'text' => 'Cadastrar produto',
-                    'route' => 'products.create',
-                ],
-                
-            ],
         ],
         
     ],
