@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/home/theo/.config/herd-lite/bin/php",
+            "args": [
+                "/var/www/html/ecommerce/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
