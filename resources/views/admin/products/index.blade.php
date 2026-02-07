@@ -31,11 +31,20 @@
             <td>R$ {{ number_format($product->price, 2, ',', '.') }}</td>
             <td>
                 <nobr>
-                    {!! $btnEdit !!}
-                    {!! $btnDelete !!}
-                    {!! $btnDetails !!}
+                    <form action="{{ route('products.edit', $product->id) }}" method="get" style="display:inline;">
+                        {!! $btnEdit !!}
+                    </form>
+                    <form action="{{ route('products.destroy', $product->id) }}" method="post" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        {!! $btnDelete !!}
+                    </form>
+                    <form action="{{ route('products.show', $product->id) }}" method="get" style="display:inline;">
+                        {!! $btnDetails !!}
+                    </form>
                 </nobr>
             </td>
+                 
         </tr>
     @endforeach
 </x-adminlte-datatable>
