@@ -321,8 +321,8 @@ return [
             'can' => 'manage-blog',
         ],
         [
-            'text' => 'pages',
-            'url' => 'admin/pages',
+            'text' => 'Products',
+            'route' => 'products.index',
             'icon' => 'far fa-fw fa-file',
             'label' => 4,
             'label_color' => 'success',

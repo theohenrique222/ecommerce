@@ -10,4 +10,5 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::resource('products', App\Http\Controllers\ProductsController::class);
 });
