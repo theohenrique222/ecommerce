@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SellersController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('products', ProductsController::class);
     Route::resource('clients', ClientsController::class);
     Route::resource('sellers', SellersController::class);
+    Route::resource('sales', SalesController::class);
 });

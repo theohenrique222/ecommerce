@@ -336,7 +336,11 @@ return [
             'route' => 'products.index',
             'icon' => 'fas fa-fw fa-lock',
         ],
-        
+        [
+            'text' => 'Vender',
+            'route' => 'sales.index',
+            'icon' => 'fas fa-fw fa-shopping-cart',
+        ],
     ],
 
     /*
