@@ -45,4 +45,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            $user->seller()->create();
+        });
+    }
+
+     public function seller()
+     {
+         return $this->hasOne(Seller::class);
+     }
 }

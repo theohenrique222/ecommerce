@@ -327,6 +327,11 @@ return [
             'icon' => 'fas fa-fw fa-user',
         ],
         [
+            'text' => 'Vendedores',
+            'route' => 'sellers.index',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
             'text' => 'Produtos',
             'route' => 'products.index',
             'icon' => 'fas fa-fw fa-lock',
