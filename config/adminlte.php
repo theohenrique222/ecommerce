@@ -317,8 +317,13 @@ return [
         ],
         ['header' => 'account_settings'],
         [
-            'text' => 'profile',
+            'text' => 'Perfil',
             'url' => 'admin/settings',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
+            'text' => 'Clients',
+            'route' => 'clients.index',
             'icon' => 'fas fa-fw fa-user',
         ],
         [
