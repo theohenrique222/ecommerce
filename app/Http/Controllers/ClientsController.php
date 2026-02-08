@@ -53,7 +53,8 @@ class ClientsController extends Controller
      */
     public function edit(Client $client)
     {
-        //
+        $client = Client::findOrFail($client->id);
+        return view('admin.clients.edit', compact('client'));
     }
 
     /**
@@ -69,6 +70,7 @@ class ClientsController extends Controller
      */
     public function destroy(Client $client)
     {
-        //
+        $client->delete();
+        return redirect()->route('clients.index')->with('success', 'Client deleted successfully.');
     }
 }
