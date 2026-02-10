@@ -15,7 +15,8 @@ class SalesController extends Controller
      */
     public function index()
     {
-        return view('admin.sales.index');
+        $sales = Sale::with(['seller.user', 'product', 'client'])->get();
+        return view('admin.sales.index', compact('sales'));
     }
 
     /**
@@ -91,6 +92,10 @@ class SalesController extends Controller
      */
     public function destroy(Sale $sale)
     {
-        //
+        $sale->delete();
+
+        return redirect()
+            ->route('sales.index')
+            ->with('success', 'Venda deletada com sucesso.');
     }
 }
