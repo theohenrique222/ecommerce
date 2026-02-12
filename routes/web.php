@@ -18,4 +18,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('clients', ClientsController::class);
     Route::resource('sellers', SellersController::class);
     Route::resource('sales', SalesController::class);
+    Route::post('sales/{sale}/payments', [SalesController::class, 'storePayment'])->name('sales.storePayment');
 });

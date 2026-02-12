@@ -8,11 +8,9 @@ class Sale extends Model
 {
     protected $fillable = [
         'seller_id',
-        'product_id',
         'client_id',
-        'quantity',
-        'price',
         'total',
+        'status',
     ];
 
     public function seller()
@@ -20,13 +18,19 @@ class Sale extends Model
         return $this->belongsTo(Seller::class);
     }
 
-    public function product()
+    public function products()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsToMany(Product::class, 'sale_product')
+            ->withPivot(['quantity', 'unit_price', 'subtotal']);
     }
 
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 }

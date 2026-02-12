@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\Payment;
+use App\Models\PaymentInstallment;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Seller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SalesController extends Controller
 {
@@ -15,7 +18,8 @@ class SalesController extends Controller
      */
     public function index()
     {
-        $sales = Sale::with(['seller.user', 'product', 'client'])->get();
+        $sales = Sale::with(['seller.user', 'products', 'client'])->get();
+
         return view('admin.sales.index', compact('sales'));
     }
 
@@ -38,28 +42,42 @@ class SalesController extends Controller
     {
         $request->validate([
             'seller_id' => 'required|exists:sellers,id',
-            'product_id' => 'required|exists:products,id',
             'client_id' => 'required|exists:clients,id',
-            'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'total' => 'required|numeric|min:0',
+            'products' => 'required|array|min:1',
+            'products.*.id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
         ]);
 
-        $total = $request->quantity * $request->price;
-
-        Sale::create([
+        $sale = Sale::create([
             'seller_id' => $request->seller_id,
-            'product_id' => $request->product_id,
             'client_id' => $request->client_id,
-            'quantity' => $request->quantity,
-            'price' => $request->price,
-            'total' => $total,
+            'total' => 0,
+            'status' => 'open',
         ]);
 
+        DB::transaction(function () use ($request, $sale) {
 
+            $total = 0;
+
+            foreach ($request->products as $item) {
+                $product = Product::findOrFail($item['id']);
+
+                $subtotal = $product->price * $item['quantity'];
+
+                $sale->products()->attach($product->id, [
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $product->price,
+                    'subtotal' => $subtotal,
+                ]);
+
+                $total += $subtotal;
+            }
+
+            $sale->update(['total' => $total]);
+        });
 
         return redirect()
-            ->route('sales.index')
+            ->route('sales.show', $sale)
             ->with('success', 'Venda criada com sucesso.');
     }
 
@@ -68,7 +86,9 @@ class SalesController extends Controller
      */
     public function show(Sale $sale)
     {
-        //
+        $sale->load(['seller.user', 'products', 'client']);
+
+        return view('admin.sales.show', compact('sale'));
     }
 
     /**
@@ -85,6 +105,48 @@ class SalesController extends Controller
     public function update(Request $request, Sale $sale)
     {
         //
+    }
+
+    public function storePayment(Request $request, Sale $sale)
+    {
+        $request->validate([
+            'payment_method' => 'required',
+            'installments' => 'nullable|array',
+        ]);
+
+        DB::transaction(function () use ($request, $sale) {
+
+            $payment = Payment::create([
+                'sale_id' => $sale->id,
+                'method' => $request->payment_method,
+                'total' => $sale->total,
+            ]);
+
+            // pagamento parcelado (custom)
+            if ($request->payment_method === 'custom') {
+
+                $sum = collect($request->installments)->sum('amount');
+
+                if ($sum != $sale->total) {
+                    abort(400, 'Valor das parcelas não confere');
+                }
+
+                foreach ($request->installments as $i => $installment) {
+                    PaymentInstallment::create([
+                        'payment_id' => $payment->id,
+                        'installment_number' => $i + 1,
+                        'amount' => $installment['amount'],
+                        'due_date' => $installment['due_date'] ?? null,
+                    ]);
+                }
+            }
+
+            $sale->update(['status' => 'paid']);
+        });
+
+        return redirect()
+            ->route('sales.index')
+            ->with('success', 'Pagamento registrado com sucesso');
     }
 
     /**
