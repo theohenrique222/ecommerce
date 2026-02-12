@@ -34,7 +34,7 @@
         <tr>
             <td>{{ $client->id }}</td>
             <td>{{ $client->name }}</td>
-            <td>{{ number_format($client->cpf, 3, '-', '.') }}</td>
+            <td>{{ $client->cpf }}</td>
             <td>
                 <nobr>
                     <form action="{{ route('clients.edit', $client->id) }}" method="get" style="display:inline;">
