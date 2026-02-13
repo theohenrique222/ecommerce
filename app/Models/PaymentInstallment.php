@@ -10,7 +10,6 @@ class PaymentInstallment extends Model
         'payment_id',
         'installment_number',
         'amount',
-        'due_date',
     ];
 
     public function payment()

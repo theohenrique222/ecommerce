@@ -11,6 +11,7 @@ class Sale extends Model
         'client_id',
         'total',
         'status',
+        'duo_date'
     ];
 
     public function seller()

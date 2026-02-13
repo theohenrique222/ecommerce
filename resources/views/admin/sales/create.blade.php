@@ -5,19 +5,21 @@
 @stop
 @section('css')
 <style>
-.product-row {
-    cursor: pointer;
-}
+    .product-row {
+        cursor: pointer;
+    }
 
-/* hover */
-.product-row:hover {
-    background-color: #f1fdfa; /* leve, só pra feedback */
-}
+    /* hover */
+    .product-row:hover {
+        background-color: #f1fdfa;
+        /* leve, só pra feedback */
+    }
 
-/* selecionado */
-.product-row.selected {
-    background-color: #e6fffa !important; /* teal */
-}
+    /* selecionado */
+    .product-row.selected {
+        background-color: #e6fffa !important;
+        /* teal */
+    }
 </style>
 @stop
 @section('content')
@@ -110,8 +112,11 @@
                 <tbody id="sale-items"></tbody>
             </x-adminlte-datatable>
 
-            <div class="col-md-3">
+            {{-- <div class="col-md-3">
                 <x-adminlte-input name="total" label="Total" readonly value="{{ old('total')}}" />
+            </div> --}}
+            <div class="col-md-3">
+                <p>Total: R$ <span id="totalDisplay"><strong>0,00</strong></span></p>
             </div>
         </div>
 
@@ -125,41 +130,43 @@
 
 @section('js')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
 
-    const saleItems = document.getElementById('sale-items');
-    const totalInput = document.querySelector('[name="total"]');
-    const modal = $('#modalCustom');
+    document.addEventListener('DOMContentLoaded', function () {
 
-    function updateTotal() {
-        let total = 0;
-        document.querySelectorAll('.item-subtotal').forEach(el => {
-            total += Number(el.innerText);
-        });
-        totalInput.value = total.toFixed(2);
-    }
+        const saleItems = document.getElementById('sale-items');
+        const totalInput = document.querySelector('[name="total"]');
+        const modal = $('#modalCustom');
 
-    document.querySelectorAll('.product-row').forEach(row => {
-        row.addEventListener('click', function () {
+        function updateTotal() {
+            let total = 0;
+            const totalDisplay = document.getElementById('totalDisplay');
+            document.querySelectorAll('.item-subtotal').forEach(el => {
+                total += Number(el.innerText);
+            });
+            totalDisplay.innerHTML = 'R$ <strong>' + total.toFixed(2) + '</strong>';
+            updateTotal();
+        }
 
-            document.querySelectorAll('.product-row')
-                .forEach(r => r.classList.remove('selected'));
+        document.querySelectorAll('.product-row').forEach(row => {
+            row.addEventListener('click', function () {
+                document.querySelectorAll('.product-row')
+                    .forEach(r => r.classList.remove('selected'));
 
-            this.classList.add('selected');
+                this.classList.add('selected');
 
-            const id = this.dataset.id;
-            const name = this.dataset.name;
-            const price = Number(this.dataset.price);
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+                const price = Number(this.dataset.price);
 
-            if (document.getElementById('product-' + id)) {
-                modal.modal('hide');
-                return;
-            }
+                if (document.getElementById('product-' + id)) {
+                    modal.modal('hide');
+                    return;
+                }
 
-            const tr = document.createElement('tr');
-            tr.id = 'product-' + id;
+                const tr = document.createElement('tr');
+                tr.id = 'product-' + id;
 
-            tr.innerHTML = `
+                tr.innerHTML = `
                 <td>
                     ${name}
                     <input type="hidden" name="products[${id}][id]" value="${id}">
@@ -168,56 +175,52 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>
                     <select name="products[${id}][quantity]" class="form-control quantity">
                         ${[...Array(10)].map((_, i) =>
-                            `<option value="${i+1}">${i+1}</option>`
-                        ).join('')}
+                    `<option value="${i + 1}">${i + 1}</option>`
+                ).join('')}
                     </select>
                 </td>
                 <td class="item-subtotal">${price.toFixed(2)}</td>
             `;
 
-            saleItems.appendChild(tr);
-            updateTotal();
+                saleItems.appendChild(tr);
+                updateTotal();
 
-            // fecha modal
-            modal.modal('hide');
+                modal.modal('hide');
+            });
         });
-    });
 
-    document.addEventListener('change', function (e) {
-        if (e.target.classList.contains('quantity')) {
-            const tr = e.target.closest('tr');
-            const price = Number(
-                tr.children[1].innerText.replace('R$', '').replace(',', '.')
-            );
-            const qty = Number(e.target.value);
+        document.addEventListener('change', function (e) {
+            if (e.target.classList.contains('quantity')) {
+                const tr = e.target.closest('tr');
+                const price = Number(
+                    tr.children[1].innerText.replace('R$', '').replace(',', '.')
+                );
+                const qty = Number(e.target.value);
 
-            tr.querySelector('.item-subtotal').innerText =
-                (price * qty).toFixed(2);
+                tr.querySelector('.item-subtotal').innerText =
+                    (price * qty).toFixed(2);
 
-            updateTotal();
-        }
-    });
-
-    document.getElementById('productSearch').addEventListener('keyup', function () {
-        const search = this.value.toLowerCase();
-        document.querySelectorAll('.product-row').forEach(row => {
-            row.style.display = row.dataset.name.toLowerCase().includes(search)
-                ? ''
-                : 'none';
+                updateTotal();
+            }
         });
+
+        document.getElementById('productSearch').addEventListener('keyup', function () {
+            const search = this.value.toLowerCase();
+            document.querySelectorAll('.product-row').forEach(row => {
+                row.style.display = row.dataset.name.toLowerCase().includes(search)
+                    ? ''
+                    : 'none';
+            });
+        });
+
+        modal.on('shown.bs.modal', function () {
+            document.querySelectorAll('.product-row')
+                .forEach(r => r.classList.remove('selected'));
+
+            document.getElementById('productSearch').focus();
+        });
+
     });
-
-    // ======================
-    // Limpa seleção ao abrir modal
-    // ======================
-    modal.on('shown.bs.modal', function () {
-        document.querySelectorAll('.product-row')
-            .forEach(r => r.classList.remove('selected'));
-
-        document.getElementById('productSearch').focus();
-    });
-
-});
 </script>
 
 

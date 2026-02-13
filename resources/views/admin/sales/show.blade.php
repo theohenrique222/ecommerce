@@ -8,6 +8,13 @@
 
 @section('content')
 
+@php
+    $statusMap = [
+        'open' => 'Pendente',
+        'paid' => 'Pago'
+    ]
+@endphp
+
 <div class="row">
     <div class="col-md-6">
         <div class="card card-primary">
@@ -17,9 +24,10 @@
             <div class="card-body">
                 <p><strong>Vendedor:</strong> {{ $sale->seller->user->name }}</p>
                 <p><strong>Cliente:</strong> {{ $sale->client->name }}</p>
-                <p><strong>Status:</strong>
+                <p><strong>Pagamento:</strong>
                     <span class="badge badge-{{ $sale->status == 'open' ? 'warning' : 'success' }}">
-                        {{ ucfirst($sale->status) }}
+                        {{-- {{ ucfirst($sale->status) }} --}}
+                        {{ $statusMap[$sale->status] ?? $sale->status }}
                     </span>
                 </p>
             </div>
@@ -141,156 +149,155 @@
                     </button>
                 </div>
 
-            </form>
+                <div class="modal fade" id="modalCredit">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
 
+                            <div class="modal-header bg-primary">
+                                <h4 class="modal-title">Pagamento no Cartão</h4>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+
+                                <div class="form-group">
+                                    <label>Quantidade de Parcelas</label>
+                                    <select name="credit_installments_modal" id="credit_installments_modal"
+                                        class="form-control">
+                                        @for($i = 1; $i <= 12; $i++)
+                                            <option value="{{ $i }}">{{ $i == 1 ? 'À vista' : $i . 'x' }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                <div class="alert alert-info text-center" id="credit_preview">
+                                    Valor da parcela: R$ 0,00
+                                </div>
+
+                                <input type="hidden" name="payment_method" value="credit_card">
+
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">
+                                    Confirmar Pagamento
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Pagamento Personalizado dentro da modal --}}
+
+                <div class="modal fade" id="modalCustom">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <div class="modal-header bg-info">
+                                <h4 class="modal-title">Parcelamento Personalizado</h4>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+
+                                <div class="form-group">
+                                    <label>Quantidade de Parcelas</label>
+                                    <input type="number" id="custom_count" class="form-control" min="1" max="24">
+                                </div>
+
+                                <div id="custom_container"></div>
+
+                                <input type="hidden" name="payment_method" value="custom">
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-info">
+                                    Confirmar Pagamento
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 @endif
-<div class="modal fade" id="modalCredit">
-    <div class="modal-dialog">
-        <div class="modal-content">
 
-            <div class="modal-header bg-primary">
-                <h4 class="modal-title">Pagamento no Cartão</h4>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-
-                <div class="form-group">
-                    <label>Quantidade de Parcelas</label>
-                    <select name="credit_installments"
-                        id="credit_installments"
-                        class="form-control">
-                        @for($i = 1; $i <= 12; $i++)
-                            <option value="{{ $i }}">{{ $i }}x</option>
-                        @endfor
-                    </select>
-                </div>
-
-                <div class="alert alert-info" id="credit_preview">
-                    Valor da parcela: R$ 0,00
-                </div>
-
-                <input type="hidden" name="payment_method" value="credit_card">
-
-            </div>
-
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">
-                    Confirmar Pagamento
-                </button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalCustom">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header bg-info">
-                <h4 class="modal-title">Parcelamento Personalizado</h4>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-
-                <div class="form-group">
-                    <label>Quantidade de Parcelas</label>
-                    <input type="number"
-                        id="custom_count"
-                        class="form-control"
-                        min="1" max="24">
-                </div>
-
-                <div id="custom_container"></div>
-
-                <input type="hidden" name="payment_method" value="custom">
-
-            </div>
-
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-info">
-                    Confirmar Pagamento
-                </button>
-            </div>
-
-        </div>
-    </div>
-</div>
 
 
 @stop
 
 @section('js')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
 
-    const total = {{ $sale->total }};
-    const creditSelect = document.getElementById('credit_installments');
-    const preview = document.getElementById('credit_preview');
+        const total = parseFloat('{{ $sale->total }}') || 0;
+        const creditSelect = document.getElementById('credit_installments_modal');
+        const preview = document.getElementById('credit_preview');
 
-    function updateCreditPreview() {
-        const installments = parseInt(creditSelect.value);
-        const value = (total / installments).toFixed(2);
-        preview.innerHTML =
-            installments + 'x de R$ ' + value.replace('.', ',');
-    }
+        function updateCreditPreview() {
+            const installments = parseFloat(creditSelect.value) || 1;
+            const value = (total / installments).toFixed(2);
+            preview.innerHTML = `${installments}x de R$ ${value.replace('.', ',')}`;
+        }
 
-    creditSelect.addEventListener('change', updateCreditPreview);
-    updateCreditPreview();
+        creditSelect.addEventListener('change', updateCreditPreview);
 
-    const countInput = document.getElementById('custom_count');
-    const container = document.getElementById('custom_container');
+        updateCreditPreview();
 
-    countInput.addEventListener('input', function () {
+        const countInput = document.getElementById('custom_count');
+        const container = document.getElementById('custom_container');
 
-        container.innerHTML = '';
-        const count = parseInt(this.value);
+        countInput.addEventListener('input', function () {
 
-        if (!count) return;
+            container.innerHTML = '';
+            const count = parseInt(this.value);
 
-        for (let i = 0; i < count; i++) {
+            if (!count) return;
 
-            const div = document.createElement('div');
-            div.classList.add('form-group');
+            for (let i = 0; i < count; i++) {
 
-            div.innerHTML = `
+                const div = document.createElement('div');
+                div.classList.add('form-group');
+
+                div.innerHTML = `
                 <label>Parcela ${i + 1}</label>
                 <input type="number" step="0.01"
                     name="installments[${i}][amount]"
                     class="form-control installment-input">
             `;
 
-            container.appendChild(div);
-        }
+                container.appendChild(div);
+            }
 
-        const inputs = document.querySelectorAll('.installment-input');
+            const inputs = document.querySelectorAll('.installment-input');
 
-        inputs.forEach((input) => {
-            input.addEventListener('input', function () {
+            inputs.forEach((input) => {
+                input.addEventListener('input', function () {
 
-                let sum = 0;
+                    let sum = 0;
 
-                inputs.forEach((el, i) => {
-                    if (i !== inputs.length - 1) {
-                        sum += parseFloat(el.value) || 0;
-                    }
+                    inputs.forEach((el, i) => {
+                        if (i !== inputs.length - 1) {
+                            sum += parseFloat(el.value) || 0;
+                        }
+                    });
+
+                    const remaining = (total - sum).toFixed(2);
+                    inputs[inputs.length - 1].value =
+                        remaining > 0 ? remaining : 0;
                 });
-
-                const remaining = (total - sum).toFixed(2);
-                inputs[inputs.length - 1].value =
-                    remaining > 0 ? remaining : 0;
             });
         });
-    });
 
-});
+    });
 </script>
 @stop

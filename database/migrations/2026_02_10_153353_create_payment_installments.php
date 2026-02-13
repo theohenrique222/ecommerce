@@ -18,7 +18,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->integer('installment_number');
             $table->decimal('amount', 10, 2);
-            $table->date('due_date');
+            $table->date('due_date')->nullable();
             $table->boolean('paid')->default(false);
             $table->timestamps();
         });

@@ -9,44 +9,47 @@
 </div>
 
 @php
-    $heads = [
-        'ID',
-        'Vendedor',
-        ['label' => 'Cliente', 'width' => 40],
-        ['label' => 'Ação', 'no-export' => true, 'width' => 5],
+    $statusMap = [
+        'open' => 'Pendente',
+        'paid' => 'Pago'
     ];
-
-    $btnEdit = '<button class="btn btn-xs btn-default text-primary mx-1 shadow" title="Edit">
-                            <i class="fa fa-lg fa-fw fa-pen"></i>
-                        </button>';
+    $heads = [
+        'Venda',
+        'Vendedor',
+        'Cliente',
+        'Pagamento',
+        'Ação',
+    ];
     $btnDelete = '<button class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete">
-                              <i class="fa fa-lg fa-fw fa-trash"></i>
-                          </button>';
+                                  <i class="fa fa-lg fa-fw fa-trash"></i>
+                              </button>';
     $btnDetails = '<button class="btn btn-xs btn-default text-teal mx-1 shadow" title="Details">
-                               <i class="fa fa-lg fa-fw fa-eye"></i>
-                           </button>';
+                                   <i class="fa fa-lg fa-fw fa-eye"></i>
+                               </button>';
 
 
 @endphp
 
-<x-adminlte-datatable id="table1" :heads="$heads">
+<x-adminlte-datatable class="text-center" id="table1" :heads="$heads">
     @foreach ($sales as $sale)
-        <tr>
+        <tr class="text-center">
             <td>{{ $sale->id }}</td>
             <td>{{ $sale->seller->user->name }}</td>
             <td>{{ $sale->client->name }}</td>
             <td>
+                <span class="badge badge-{{ $sale->status == 'open' ? 'warning' : 'success' }}">
+                    {{ $statusMap[$sale->status] ?? $sale->status }}
+                </span>
+            </td>
+            <td>
                 <nobr>
-                    <form action="{{ route('sales.edit', $sale->id) }}" method="get" style="display:inline;">
-                        {!! $btnEdit !!}
+                    <form action="{{ route('sales.show', $sale->id) }}" method="get" style="display:inline;">
+                        {!! $btnDetails !!}
                     </form>
                     <form action="{{ route('sales.destroy', $sale->id) }}" method="post" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         {!! $btnDelete !!}
-                    </form>
-                    <form action="{{ route('sales.show', $sale->id) }}" method="get" style="display:inline;">
-                        {!! $btnDetails !!}
                     </form>
                 </nobr>
             </td>

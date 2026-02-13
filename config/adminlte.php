@@ -110,7 +110,7 @@ return [
     */
 
     'preloader' => [
-        'enabled' => true,
+        'enabled' => false,
         'mode' => 'fullscreen',
         'img' => [
             'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
@@ -257,7 +257,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'dashboard',
+    'dashboard_url' => '/',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -302,7 +302,7 @@ return [
         // Navbar items:
         [
             'type' => 'navbar-search',
-            'text' => 'search',
+            'text' => 'Buscar',
             'topnav_right' => true,
         ],
         [
@@ -315,7 +315,7 @@ return [
             'type' => 'sidebar-menu-search',
             'text' => 'search',
         ],
-        ['header' => 'account_settings'],
+        ['header' => 'USUÁRIOS'],
         [
             'text' => 'Perfil',
             'url' => 'admin/settings',
@@ -331,10 +331,11 @@ return [
             'route' => 'sellers.index',
             'icon' => 'fas fa-fw fa-user',
         ],
+        ['header' => 'VENDAS'],
         [
             'text' => 'Produtos',
             'route' => 'products.index',
-            'icon' => 'fas fa-fw fa-lock',
+            'icon' => 'fas fa-fw fa-shopping-bag',
         ],
         [
             'text' => 'Vender',
