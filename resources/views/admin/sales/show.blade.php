@@ -13,15 +13,6 @@
         'open' => 'Pendente',
         'paid' => 'Pago'
 ];
-
-    $method = $sale->payments->first()->method ?? null;
-
-    $methodLabel = [
-        'credit_card' => 'Cartão de Crédito',
-        'pix' => 'PIX',
-        'cash' => 'Dinheiro',
-        'custom' => 'Parcelamento Personalizado'
-        ]
     
 @endphp
 
@@ -59,13 +50,14 @@
                     <p class="text-info">
                         Forma de pagamento:
                         <strong>
-                            {{ $methodLabel[$method] ?? 'Não definido' }}
+                            {{ $methodLabel }}
                         </strong>
                     </p>
                     <p class="text-info">
-                        Quantidade de parcelas:
-                        <strong>{{ $sale->payments->first()->installments->first()->installment_number ?? 0 }}</strong>
-                        x
+                        Quantidade de parcelas: <strong>{{ $installments }}</strong>x
+                    </p>
+                    <p class="text-info">
+                        Valor por parcela: <strong>R$ {{ $amount }}</strong>
                     </p>
                 </div>
 

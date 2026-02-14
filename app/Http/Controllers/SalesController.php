@@ -87,9 +87,22 @@ class SalesController extends Controller
     public function show(Sale $sale)
     {
         $sale->load(['seller.user', 'products', 'client']);
-        $payments = $sale->payments()->with('installments')->get();
+        $payments = $sale->payments()->with('installments')->first();
+        $methodLabel = [
+            'credit_card' => 'Cartão de Crédito',
+            'pix' => 'Pix',
+            'cash' => 'Dinheiro',
+            'custom' => 'Personalizado',
+        ];
 
-        return view('admin.sales.show', compact('sale', 'payments'));
+        $method = $payments?->method ?? null;
+
+        $methodLabel = $methodLabel[$method] ?? 'Não definido';
+
+        $installments = $sale->payments->first()->installments->first()->installment_number ?? 0;
+        $amount = $sale->payments->first()->installments->first()->amount ?? 0;
+
+        return view('admin.sales.show', compact('sale', 'payments', 'method', 'methodLabel', 'installments', 'amount'));
     }
 
     /**
@@ -114,9 +127,9 @@ class SalesController extends Controller
             'payment_method' => 'required',
             'installments' => 'nullable|array',
         ]);
-        
+
         DB::transaction(function () use ($request, $sale) {
-            
+
             $payment = Payment::create([
                 'sale_id' => $sale->id,
                 'method' => $request->payment_method,
@@ -150,7 +163,6 @@ class SalesController extends Controller
                     'due_date' => null,
                 ]);
             }
-
 
             $sale->update(['status' => 'paid']);
         });
