@@ -12,7 +12,17 @@
     $statusMap = [
         'open' => 'Pendente',
         'paid' => 'Pago'
-    ]
+];
+
+    $method = $sale->payments->first()->method ?? null;
+
+    $methodLabel = [
+        'credit_card' => 'Cartão de Crédito',
+        'pix' => 'PIX',
+        'cash' => 'Dinheiro',
+        'custom' => 'Parcelamento Personalizado'
+        ]
+    
 @endphp
 
 <div class="row">
@@ -45,18 +55,20 @@
                 </h2>
             </div>
             @if ($sale->status != 'open')
-            <div class="card-body text-center">
-                <p class="text-info">
-                    Forma de pagamento: 
-                    <strong>
-                        {{ $sale->payments->first()->method == 'custom' ? 'Parcelamento Personalizado' : $sale->payments->first()->method ?? 'Não definido' }}
-                    </strong>
-                </p>
-                <p class="text-info">
-                    Quantidade de parcelas: {{ $payments->first()->installments->count() ?? 0 }}
-                </p>
-            </div>
-                
+                <div class="card-body text-center">
+                    <p class="text-info">
+                        Forma de pagamento:
+                        <strong>
+                            {{ $methodLabel[$method] ?? 'Não definido' }}
+                        </strong>
+                    </p>
+                    <p class="text-info">
+                        Quantidade de parcelas:
+                        <strong>{{ $sale->payments->first()->installments->first()->installment_number ?? 0 }}</strong>
+                        x
+                    </p>
+                </div>
+
             @endif
         </div>
     </div>
@@ -127,41 +139,13 @@
                     </div>
                 </div>
 
-                {{-- CARTÃO --}}
-                <div id="credit_installments_area" style="display:none;">
-                    <h5>Parcelamento no Cartão</h5>
-
-                    <div class="form-group">
-                        <label>Quantidade de Parcelas</label>
-                        <select name="credit_installments" id="credit_installments" class="form-control">
-                            @for($i = 1; $i <= 12; $i++)
-                                <option value="{{ $i }}">{{ $i }}x</option>
-                            @endfor
-                        </select>
-                    </div>
-
-                    <div class="alert alert-info mt-2" id="credit_installment_preview">
-                        Valor da parcela: R$ 0,00
-                    </div>
-                </div>
-
-                {{-- PERSONALIZADO --}}
-                <div id="custom_installments_area" style="display:none;">
-                    <h5>Parcelamento Personalizado</h5>
-
-                    <div class="form-group">
-                        <label>Quantidade de Parcelas</label>
-                        <input type="number" id="installments_count" class="form-control" min="1" max="24">
-                    </div>
-
-                    <div id="installments_container"></div>
-                </div>
-
                 <div class="text-right mt-3">
                     <button type="submit" class="btn btn-success">
-                        Confirmar Pagamento
+                        Finalizar Compra
                     </button>
                 </div>
+
+                {{-- Modal de Pagamento no Cartão --}}
 
                 <div class="modal fade" id="modalCredit">
                     <div class="modal-dialog">
@@ -173,34 +157,26 @@
                                     <span>&times;</span>
                                 </button>
                             </div>
-
                             <div class="modal-body">
-
                                 <div class="form-group">
                                     <label>Quantidade de Parcelas</label>
-                                    <select name="credit_installments_modal" id="credit_installments_modal"
+                                    <select name="credit_installments" id="credit_installments_modal"
                                         class="form-control">
-                                        @for($i = 1; $i <= 12; $i++)
-                                            <option value="{{ $i }}">{{ $i == 1 ? 'À vista' : $i . 'x' }}</option>
-                                        @endfor
+                                        @for($i = 1; $i <= 12; $i++) <option value="{{ $i }}">{{ $i == 1 ? 'À vista' : $i .
+                                            'x' }}</option>
+                                            @endfor
                                     </select>
                                 </div>
 
                                 <div class="alert alert-info text-center" id="credit_preview">
                                     Valor da parcela: R$ 0,00
                                 </div>
-
-                                <input type="hidden" name="payment_method" value="credit_card">
-
-
                             </div>
-
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">
+                                <button name="payment_method" value="credit_card" class="btn btn-primary">
                                     Confirmar Pagamento
                                 </button>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -217,22 +193,15 @@
                                     <span>&times;</span>
                                 </button>
                             </div>
-
                             <div class="modal-body">
-
                                 <div class="form-group">
                                     <label>Quantidade de Parcelas</label>
                                     <input type="number" id="custom_count" class="form-control" min="1" max="24">
                                 </div>
-
                                 <div id="custom_container"></div>
-
-                                <input type="hidden" name="payment_method" value="custom">
-
                             </div>
-
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-info">
+                                <button name="payment_method" value="custom" class="btn btn-info">
                                     Confirmar Pagamento
                                 </button>
                             </div>

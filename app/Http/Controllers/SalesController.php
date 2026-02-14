@@ -114,9 +114,9 @@ class SalesController extends Controller
             'payment_method' => 'required',
             'installments' => 'nullable|array',
         ]);
-
+        
         DB::transaction(function () use ($request, $sale) {
-
+            
             $payment = Payment::create([
                 'sale_id' => $sale->id,
                 'method' => $request->payment_method,
@@ -141,6 +141,16 @@ class SalesController extends Controller
                     ]);
                 }
             }
+
+            if ($request->payment_method == 'credit_card') {
+                PaymentInstallment::create([
+                    'payment_id' => $payment->id,
+                    'installment_number' => $request->credit_installments,
+                    'amount' => $sale->total,
+                    'due_date' => null,
+                ]);
+            }
+
 
             $sale->update(['status' => 'paid']);
         });
