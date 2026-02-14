@@ -60,7 +60,6 @@
                                 <x-adminlte-input id="productSearch" name="iSearch" label="Buscar"
                                     placeholder="Buscar Produto" igroup-size="md">
                                     <x-slot name="appendSlot">
-                                        <x-adminlte-button theme="outline-success" label="Go!" />
                                     </x-slot>
                                     <x-slot name="prependSlot">
                                         <div class="input-group-text text-success">

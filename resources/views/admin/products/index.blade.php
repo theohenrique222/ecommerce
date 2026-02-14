@@ -1,5 +1,6 @@
 @extends('adminlte::page')
 @section('content_header')
+@section('plugins.Datatables', true)
 <h1>Produtos</h1>
 
 <div class="text-center mb-4">
@@ -12,28 +13,28 @@
     $heads = [
         'ID',
         'Nome',
-        ['label' => 'Valor', 'width' => 40],
-        ['label' => 'Ação', 'no-export' => true, 'width' => 5],
+        'Valor',
+        'Ação'
     ];
 
     $btnEdit = '<button class="btn btn-xs btn-default text-primary mx-1 shadow" title="Edit">
-                            <i class="fa fa-lg fa-fw fa-pen"></i>
-                        </button>';
+                                    <i class="fa fa-lg fa-fw fa-pen"></i>
+                                </button>';
     $btnDelete = '<button class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete">
-                              <i class="fa fa-lg fa-fw fa-trash"></i>
-                          </button>';
+                                      <i class="fa fa-lg fa-fw fa-trash"></i>
+                                  </button>';
     $btnDetails = '<button class="btn btn-xs btn-default text-teal mx-1 shadow" title="Details">
-                               <i class="fa fa-lg fa-fw fa-eye"></i>
-                           </button>';
+                                       <i class="fa fa-lg fa-fw fa-eye"></i>
+                                   </button>';
 
 
 @endphp
 
-<x-adminlte-datatable id="table1" :heads="$heads">
+<x-adminlte-datatable class="text-center" id="table1" :heads="$heads">
     @foreach ($products as $product)
         <tr>
             <td>{{ $product->id }}</td>
-            <td>{{ $product->name }}</td>
+            <td class="product-name">{{ $product->name }}</td>
             <td>R$ {{ number_format($product->price, 2, ',', '.') }}</td>
             <td>
                 <nobr>
@@ -53,7 +54,4 @@
         </tr>
     @endforeach
 </x-adminlte-datatable>
-
-
-
 @stop
