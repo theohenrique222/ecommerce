@@ -87,8 +87,9 @@ class SalesController extends Controller
     public function show(Sale $sale)
     {
         $sale->load(['seller.user', 'products', 'client']);
+        $payments = $sale->payments()->with('installments')->get();
 
-        return view('admin.sales.show', compact('sale'));
+        return view('admin.sales.show', compact('sale', 'payments'));
     }
 
     /**

@@ -338,7 +338,7 @@ return [
             'icon' => 'fas fa-fw fa-shopping-bag',
         ],
         [
-            'text' => 'Vender',
+            'text' => 'Vendas',
             'route' => 'sales.index',
             'icon' => 'fas fa-fw fa-shopping-cart',
         ],

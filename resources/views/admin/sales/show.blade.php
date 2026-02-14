@@ -44,6 +44,20 @@
                     R$ {{ number_format($sale->total, 2, ',', '.') }}
                 </h2>
             </div>
+            @if ($sale->status != 'open')
+            <div class="card-body text-center">
+                <p class="text-info">
+                    Forma de pagamento: 
+                    <strong>
+                        {{ $sale->payments->first()->method == 'custom' ? 'Parcelamento Personalizado' : $sale->payments->first()->method ?? 'Não definido' }}
+                    </strong>
+                </p>
+                <p class="text-info">
+                    Quantidade de parcelas: {{ $payments->first()->installments->count() ?? 0 }}
+                </p>
+            </div>
+                
+            @endif
         </div>
     </div>
 
